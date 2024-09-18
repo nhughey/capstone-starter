@@ -16,25 +16,3 @@ app.use((err, req, res, next) => {
 });
 
 app.listen(port, () => console.log(`listening on port ${port}`));
-
-// const init = async () => {
-//   const port = process.env.PORT || 3000;
-//   await client.connect();
-//   console.log("connected to database");
-
-//   await createTables();
-//   console.log("tables created");
-
-//   const [moe, lucy, ethyl, curly] = await Promise.all([
-//     createUser({ username: "moe", password: "m_pw" }),
-//     createUser({ username: "lucy", password: "l_pw" }),
-//     createUser({ username: "ethyl", password: "e_pw" }),
-//     createUser({ username: "curly", password: "c_pw" }),
-//   ]);
-
-//   console.log(await fetchUsers());
-
-//   app.listen(port, () => console.log(`listening on port ${port}`));
-// };
-
-// init();
