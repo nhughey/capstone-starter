@@ -17,8 +17,8 @@ const AuthForm = ({ authAction, mode='login' })=> {
   return (
     <form onSubmit={ submit }>
       { !!error && <div className='error'>{ error }</div> }
-      <input value={ username } placeholder='username' onChange={ ev=> setUsername(ev.target.value)}/>
-      <input value={ password} placeholder='password' onChange={ ev=> setPassword(ev.target.value)}/>
+      <input value={ username } placeholder='Username' onChange={ ev=> setUsername(ev.target.value)}/>
+      <input value={ password} placeholder='Password' onChange={ ev=> setPassword(ev.target.value)}/>
       <button>{ mode }</button>
     </form>
   );
