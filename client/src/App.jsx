@@ -1,18 +1,19 @@
 import { useState, useEffect } from "react";
 import { Link, Route, Routes } from "react-router-dom";
-import Users from "./pages/Users";
-import Businesses from "./pages/Businesses";
-import CreateReview from "./pages/CreateReview";
 import Home from "./pages/Home";
+import Games from "./pages/Games";
+import GameDetails from "./pages/GameDetails";
+import Login from "./pages/Login";
+import Register from "./pages/Register";
+import Profile from "./pages/Profile";
 
 function App() {
   const [auth, setAuth] = useState({});
-  const [users, setUsers] = useState([]);
-  const [businesses, setBusinesses] = useState([]);
-  const [reviews, setReviews] = useState([]);
+  const [games, setGames] = useState([]);
 
   useEffect(() => {
     attemptLoginWithToken();
+    fetchGames();
   }, []);
 
   const attemptLoginWithToken = async () => {
@@ -32,23 +33,20 @@ function App() {
     }
   };
 
-  const authAction = async (credentials, mode) => {
-    const response = await fetch(`/api/auth/${mode}`, {
-      method: "POST",
-      body: JSON.stringify(credentials),
-      headers: {
-        "Content-Type": "application/json",
-      },
-    });
-
-    const json = await response.json();
-    if (response.ok) {
-      window.localStorage.setItem("token", json.token);
-      attemptLoginWithToken();
-    } else {
-      throw json;
+  const fetchGames = async () => {
+    try {
+      const response = await fetch('/api/games');
+      if (!response.ok) {
+        throw new Error('Failed to fetch games');
+      }
+      const data = await response.json();
+      console.log('Fetched games:', data); // For debugging
+      setGames(data);
+    } catch (error) {
+      console.error('Error fetching games:', error);
     }
   };
+
 
   const logout = () => {
     window.localStorage.removeItem("token");
@@ -56,40 +54,32 @@ function App() {
   };
 
   return (
-    <>
-      <h1>Acme Business Reviews</h1>
+    <div>
       <nav>
         <Link to="/">Home</Link>
-        <Link to="/businesses">Businesses ({businesses.length})</Link>
-        <Link to="/users">Users ({users.length})</Link>
+        <Link to="/games">Games</Link>
         {auth.id ? (
-          <Link to="/createReview">Create Review</Link>
+          <>
+            <Link to="/profile">Profile</Link>
+            <button onClick={logout}>Logout</button>
+          </>
         ) : (
-          <Link to="/">Register/Login</Link>
+          <>
+            <Link to="/login">Login</Link>
+            <Link to="/register">Register</Link>
+          </>
         )}
       </nav>
-      {auth.id && <button onClick={logout}>Logout {auth.username}</button>}
+
       <Routes>
-        <Route
-          path="/"
-          element={
-            <Home
-              authAction={authAction}
-              auth={auth}
-              businesses={businesses}
-              users={users}
-              reviews={reviews}
-            />
-          }
-        />
-        <Route
-          path="/businesses"
-          element={<Businesses businesses={businesses} />}
-        />
-        <Route path="/users" element={<Users users={users} />} />
-        {!!auth.id && <Route path="/createReview" element={<CreateReview />} />}
+        <Route path="/" element={<Home />} />
+        <Route path="/games" element={<Games games={games} />} />
+        <Route path="/games/:id" element={<GameDetails auth={auth} />} />
+        <Route path="/login" element={<Login setAuth={setAuth} />} />
+        <Route path="/register" element={<Register setAuth={setAuth} />} />
+        <Route path="/profile" element={<Profile auth={auth} setAuth={setAuth} />} />
       </Routes>
-    </>
+    </div>
   );
 }
 

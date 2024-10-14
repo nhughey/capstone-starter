@@ -72,4 +72,23 @@ const authenticate = async ({ username, password }) => {
   return { token };
 };
 
-module.exports = { createUser, findUserWithToken, fetchUsers, authenticate };
+const fetchUserById = async (id) => {
+  const SQL = `SELECT id, username FROM users WHERE id = $1`;
+  const response = await client.query(SQL, [id]);
+  return response.rows[0];
+};
+
+const updateUser = async (id, { username }) => {
+  const SQL = `UPDATE users SET username = $1 WHERE id = $2 RETURNING id, username`;
+  const response = await client.query(SQL, [username, id]);
+  return response.rows[0];
+};
+
+module.exports = { 
+  createUser, 
+  findUserWithToken, 
+  fetchUsers, 
+  authenticate, 
+  fetchUserById, 
+  updateUser 
+};
