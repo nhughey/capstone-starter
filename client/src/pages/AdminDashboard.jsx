@@ -1,55 +1,47 @@
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 
 const AdminDashboard = () => {
-  const [games, setGames] = useState([]);
   const [users, setUsers] = useState([]);
+  const [games, setGames] = useState([]);
 
   useEffect(() => {
-    fetchGames();
     fetchUsers();
+    fetchGames();
   }, []);
 
-  const fetchGames = async () => {
-    const response = await fetch('/api/games');
-    const data = await response.json();
-    setGames(data);
-  };
-
   const fetchUsers = async () => {
-    const response = await fetch('/api/users');
-    const data = await response.json();
-    setUsers(data);
+    try {
+      const response = await fetch('/api/users');
+      const data = await response.json();
+      setUsers(data);
+    } catch (error) {
+      console.error('Error fetching users:', error);
+    }
   };
 
-  const deleteGame = async (id) => {
-    const token = window.localStorage.getItem("token");
-    const response = await fetch(`/api/games/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': token
-      }
-    });
-    if (response.ok) {
-      setGames(games.filter(game => game.id !== id));
+  const fetchGames = async () => {
+    try {
+      const response = await fetch('/api/games');
+      const data = await response.json();
+      setGames(data);
+    } catch (error) {
+      console.error('Error fetching games:', error);
     }
   };
 
   return (
     <div>
       <h2>Admin Dashboard</h2>
-      <h3>Games</h3>
-      <ul>
-        {games.map(game => (
-          <li key={game.id}>
-            {game.title}
-            <button onClick={() => deleteGame(game.id)}>Delete</button>
-          </li>
-        ))}
-      </ul>
       <h3>Users</h3>
       <ul>
         {users.map(user => (
           <li key={user.id}>{user.username}</li>
+        ))}
+      </ul>
+      <h3>Games</h3>
+      <ul>
+        {games.map(game => (
+          <li key={game.id}>{game.title}</li>
         ))}
       </ul>
     </div>
