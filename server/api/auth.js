@@ -24,10 +24,10 @@ router.post("/register", async (req, res, next) => {
     next(ex);
   }
 });
-
-router.get("/me", isLoggedIn, (req, res, next) => {
+router.get("/me", async (req, res, next) => {
   try {
-    res.send(req.user);
+    const user = await findUserWithToken(req.headers.authorization);
+    res.send(user);
   } catch (ex) {
     next(ex);
   }

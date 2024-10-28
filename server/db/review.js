@@ -24,10 +24,17 @@ const fetchReviews = async () => {
 };
 
 const fetchReviewsByGameId = async (game_id) => {
-  const SQL = `SELECT * FROM reviews WHERE game_id = $1`;
+  const SQL = `
+    SELECT r.*, u.username
+    FROM reviews r
+    JOIN users u ON r.user_id = u.id
+    WHERE r.game_id = $1
+    ORDER BY r.created_at DESC
+  `;
   const response = await client.query(SQL, [game_id]);
   return response.rows;
 };
+
 const updateReview = async (id, { content, rating }) => {
   const SQL = `
     UPDATE reviews
