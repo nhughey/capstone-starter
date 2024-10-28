@@ -17,6 +17,7 @@ const Profile = ({ auth, setAuth }) => {
   const [editContent, setEditContent] = useState('');
   const [editRating, setEditRating] = useState(5);
   const [errorMessage, setErrorMessage] = useState('');
+  const [isDropdown, setIsDropdown] = useState(false); // State to handle dropdown
 
   const navigate = useNavigate();
 
@@ -121,9 +122,15 @@ const Profile = ({ auth, setAuth }) => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users');
+      console.log('Fetching users with review counts...'); // Add this line to verify function execution
+      const response = await fetch('/api/users/withReviewCount'); // Updated endpoint
+      if (!response.ok) {
+        throw new Error(`Failed to fetch users: ${response.status}`);
+      }
       const data = await response.json();
+      console.log('Fetched users:', data); // Add this line to check fetched data
       setUsers(data);
+      setIsDropdown(data.length > 5); // Set dropdown state based on user count
     } catch (error) {
       console.error('Error fetching users:', error);
     }
@@ -293,11 +300,26 @@ const Profile = ({ auth, setAuth }) => {
           {/* Users List */}
           <div>
             <h4>Users ({users.length})</h4>
-            <ul>
-              {users.map(user => (
-                <li key={user.id}>{user.username}</li>
-              ))}
-            </ul>
+            {isDropdown ? (
+              <details>
+                <summary>View All Users</summary>
+                <ul>
+                  {users.map(user => (
+                    <li key={user.id}>
+                      {user.username} - {user.is_admin ? 'Administrator' : 'User'} | Reviews: {user.review_count || 0}
+                    </li>
+                  ))}
+                </ul>
+              </details>
+            ) : (
+              <ul>
+                {users.map(user => (
+                  <li key={user.id}>
+                    {user.username} - {user.is_admin ? 'Administrator' : 'User'} | Reviews: {user.review_count || 0}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
 
           {/* Add Game Form */}

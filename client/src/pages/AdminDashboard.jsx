@@ -11,7 +11,7 @@ const AdminDashboard = () => {
 
   const fetchUsers = async () => {
     try {
-      const response = await fetch('/api/users');
+      const response = await fetch('/api/users/withReviewCount'); // Updated endpoint
       const data = await response.json();
       setUsers(data);
     } catch (error) {

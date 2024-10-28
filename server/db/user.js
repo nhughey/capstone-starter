@@ -95,11 +95,32 @@ const updateUser = async (id, { username }) => {
   return response.rows[0];
 };
 
+const fetchAllUsersWithReviewCount = async () => {
+  try {
+    const { rows } = await client.query(`
+      SELECT 
+        users.id, 
+        users.username, 
+        users.is_admin, 
+        COUNT(reviews.id) AS review_count
+      FROM users
+      LEFT JOIN reviews ON users.id = reviews.user_id
+      GROUP BY users.id
+    `);
+    console.log("Fetched users with review counts:", rows); // Add this line
+    return rows;
+  } catch (error) {
+    throw error;
+  }
+};
+
+
 module.exports = { 
   createUser, 
   findUserWithToken, 
   fetchUsers, 
   authenticate, 
   fetchUserById, 
-  updateUser 
+  updateUser,
+  fetchAllUsersWithReviewCount // New function added here
 };

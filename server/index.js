@@ -1,29 +1,48 @@
-
 const express = require("express");
 const path = require('path');
 const app = express();
 const port = process.env.PORT || 3000;
 const { client } = require("./db");
-client.connect();
 
-app.use(express.json());
+// Initialize db connection with error handling
+const init = async () => {
+  try {
+    await client.connect();
+    console.log('Connected to database');
 
-app.use("/api", require("./api"));
+    // Middleware
+    app.use(express.json());
 
-// Serve static files from the React app
-app.use(express.static(path.join(__dirname, '../client/dist')));
+    // API Routes before static files
+    app.use("/api", require("./api"));
 
-// The "catchall" handler: for any request that doesn't
-// match one above, send back React's index.html file.
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/dist/index.html'));
-});
+    // Serve static files from the React app
+    app.use(express.static(path.join(__dirname, '../client/dist')));
 
-app.use((err, req, res, next) => {
-  console.log(err);
-  res
-    .status(err.status || 500)
-    .send({ error: err.message ? err.message : err });
-});
+    // The "catchall" handler: for any request that doesn't
+    // match one above, send back React's index.html file.
+    app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname, '../client/dist/index.html'));
+    });
 
-app.listen(port, () => console.log(`listening on port ${port}`));
+    // Error handling
+    app.use((err, req, res, next) => {
+      console.log(err);
+      res.status(err.status || 500)
+         .send({ error: err.message ? err.message : err });
+    });
+
+    // Start server
+    app.listen(port, () => {
+      console.log(`Server running on port ${port}`);
+      console.log(`Database connected and server is ready`);
+    });
+
+  } catch (error) {
+    console.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Start the application
+init();
