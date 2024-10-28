@@ -46,10 +46,25 @@ const updateReview = async (id, { content, rating }) => {
   return response.rows[0];
 };
 
+const fetchReviewsByUserId = async (user_id) => {
+  const SQL = `
+    SELECT 
+      r.*,
+      g.title as game_title,
+      g.image_url as game_image_url
+    FROM reviews r
+    JOIN games g ON r.game_id = g.id
+    WHERE r.user_id = $1
+    ORDER BY r.created_at DESC
+  `;
+  const response = await client.query(SQL, [user_id]);
+  return response.rows;
+};
+
 const deleteReview = async (id) => {
   const SQL = `DELETE FROM reviews WHERE id = $1 RETURNING *`;
   const response = await client.query(SQL, [id]);
   return response.rows[0];
 };
 
-module.exports = { createReview, fetchReviews, fetchReviewsByGameId, updateReview, deleteReview };
+module.exports = { createReview, fetchReviews, fetchReviewsByGameId, updateReview, fetchReviewsByUserId, deleteReview };
