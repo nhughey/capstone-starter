@@ -182,7 +182,7 @@ const Profile = ({ auth, setAuth }) => {
   };
 
   return (
-    <div>
+    <div className="container">
       <h2>Profile</h2>
 
       {/* User Information Section */}
